@@ -46,14 +46,27 @@ def get_db_engine(db_url: str = None, service_name: str = "app"):
         default_sqlite = f"sqlite:///./{service_name}.db"
         db_url = os.getenv("DATABASE_URL", default_sqlite)
 
+    # Normalize Heroku / Render / Supabase legacy postgres:// schemes for SQLAlchemy 2.0
+    if db_url.startswith("postgres://"):
+        db_url = db_url.replace("postgres://", "postgresql://", 1)
+
     connect_args = {}
+    engine_kwargs = {
+        "pool_pre_ping": True,
+    }
+
     if db_url.startswith("sqlite"):
         connect_args["check_same_thread"] = False
+    else:
+        # Production connection pool tuning for PostgreSQL / MySQL
+        engine_kwargs["pool_size"] = int(os.getenv("DB_POOL_SIZE", "10"))
+        engine_kwargs["max_overflow"] = int(os.getenv("DB_MAX_OVERFLOW", "20"))
+        engine_kwargs["pool_recycle"] = int(os.getenv("DB_POOL_RECYCLE", "1800"))
 
     engine = create_engine(
         db_url,
         connect_args=connect_args,
-        pool_pre_ping=True,
+        **engine_kwargs,
     )
     return engine
 

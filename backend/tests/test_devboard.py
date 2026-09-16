@@ -122,6 +122,15 @@ def test_health_endpoint():
     assert resp.json()["service"] == "devboard"
 
 
+def test_root_serves_frontend():
+    client = TestClient(app)
+    resp = client.get("/")
+    assert resp.status_code == 200
+    # Returns HTML containing DevBoard title or fallback status
+    assert "DevBoard" in resp.text or resp.json().get("service") == "devboard"
+
+
+
 def test_connect_repository():
     client = TestClient(app)
     resp = client.post("/api/v1/devboard/repositories", json={"full_name": "org/new-repo"})

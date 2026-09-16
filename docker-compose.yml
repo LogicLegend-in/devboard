@@ -1,12 +1,27 @@
-﻿services:
+services:
   devboard:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: logiclegend-devboard
+    container_name: devboard
     ports:
-      - "8004:8004"
+      - "${PORT:-8004}:${PORT:-8004}"
     environment:
-      - PORT=8004
-      - ENVIRONMENT=development
+      - PORT=${PORT:-8004}
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - DATABASE_URL=${DATABASE_URL:-sqlite:///./data/devboard.db}
+      - CORS_ORIGINS=${CORS_ORIGINS:-*}
+      - GITHUB_TOKEN=${GITHUB_TOKEN:-}
+      - WORKERS=${WORKERS:-2}
+    volumes:
+      - devboard_data:/app/data
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request, os; port = os.getenv('PORT', '8004'); urllib.request.urlopen(f'http://localhost:{port}/health')\""]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+volumes:
+  devboard_data:

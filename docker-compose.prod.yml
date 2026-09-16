@@ -1,0 +1,48 @@
+# ==============================================================================
+# Production Docker Compose with PostgreSQL 16
+# Usage: docker compose -f docker-compose.prod.yml up -d --build
+# ==============================================================================
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: devboard-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-devboard_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-devboard_secure_password_2026}
+      POSTGRES_DB: ${POSTGRES_DB:-devboard}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-devboard_admin} -d ${POSTGRES_DB:-devboard}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  devboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: devboard-app
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${PORT:-8004}:${PORT:-8004}"
+    environment:
+      - PORT=${PORT:-8004}
+      - ENVIRONMENT=production
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-devboard_admin}:${POSTGRES_PASSWORD:-devboard_secure_password_2026}@db:5432/${POSTGRES_DB:-devboard}
+      - CORS_ORIGINS=${CORS_ORIGINS:-*}
+      - GITHUB_TOKEN=${GITHUB_TOKEN:-}
+      - WORKERS=${WORKERS:-4}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request, os; port = os.getenv('PORT', '8004'); urllib.request.urlopen(f'http://localhost:{port}/health')\""]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  postgres_data:

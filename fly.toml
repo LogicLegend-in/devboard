@@ -1,0 +1,27 @@
+# ==============================================================================
+# Fly.io App Configuration for DevBoard
+# Docs: https://fly.io/docs/reference/configuration/
+# ==============================================================================
+app = "logiclegend-devboard"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "8004"
+  ENVIRONMENT = "production"
+
+[http_service]
+  internal_port = 8004
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[http_service.checks]]
+  grace_period = "10s"
+  interval = "30s"
+  method = "GET"
+  timeout = "5s"
+  path = "/health"

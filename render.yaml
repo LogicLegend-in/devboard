@@ -1,0 +1,32 @@
+# ==============================================================================
+# Render Blueprint Configuration for DevBoard
+# Docs: https://render.com/docs/blueprint-spec
+# ==============================================================================
+services:
+  - type: web
+    name: devboard
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: oregon
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: 8004
+      - key: ENVIRONMENT
+        value: production
+      - key: CORS_ORIGINS
+        value: "*"
+      # Optional: To use managed PostgreSQL on Render, uncomment the DATABASE_URL below
+      # - key: DATABASE_URL
+      #   fromDatabase:
+      #     name: devboard-db
+      #     property: connectionString
+      - key: GITHUB_TOKEN
+        sync: false
+
+# Optional Managed PostgreSQL on Render:
+# databases:
+#   - name: devboard-db
+#     plan: free
+#     region: oregon

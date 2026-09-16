@@ -333,7 +333,11 @@
   </div>
 
   <script>
-    const API_BASE = "http://localhost:8004";
+    // In production or when hosted by FastAPI, API_BASE matches current origin.
+    // When opened directly as a local file, it falls back to http://localhost:8004.
+    const API_BASE = window.location.protocol === 'file:' 
+      ? 'http://localhost:8004' 
+      : (window.__API_BASE__ || window.location.origin);
 
     function switchTab(tabId) {
       document.querySelectorAll('.tab-view').forEach(el => el.classList.remove('active'));

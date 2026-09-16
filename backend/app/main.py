@@ -72,6 +72,18 @@ async def lifespan(app: FastAPI):
     yield
 
 
+from fastapi.responses import FileResponse, PlainTextResponse
+from fastapi.staticfiles import StaticFiles
+
+# Determine frontend directory path across local development and container environments
+possible_frontend_dirs = [
+    os.getenv("FRONTEND_DIR"),
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "frontend")),
+    "/app/frontend",
+    "./frontend",
+]
+FRONTEND_DIR = next((d for d in possible_frontend_dirs if d and os.path.isdir(d)), None)
+
 app = FastAPI(
     title="DevBoard Engineering Observability API",
     version="1.0.0",
@@ -79,9 +91,12 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+cors_origins_env = os.getenv("CORS_ORIGINS", "*")
+allowed_origins = [o.strip() for o in cors_origins_env.split(",") if o.strip()] if cors_origins_env != "*" else ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -100,7 +115,7 @@ def ready():
     return {"status": "ready", "service": "devboard"}
 
 
-@app.get("/metrics")
+@app.get("/metrics", response_class=PlainTextResponse)
 def metrics():
     return (
         "# HELP devboard_repositories_tracked Tracked software engineering repositories\n"
@@ -110,3 +125,23 @@ def metrics():
         "# TYPE devboard_workflow_runs_total counter\n"
         "devboard_workflow_runs_total 72\n"
     )
+
+
+# Serve interactive frontend at root URL in production and local execution
+@app.get("/", include_in_schema=False)
+async def serve_index():
+    if FRONTEND_DIR:
+        index_file = os.path.join(FRONTEND_DIR, "index.html")
+        if os.path.exists(index_file):
+            return FileResponse(index_file)
+    return {
+        "status": "healthy",
+        "service": "devboard",
+        "docs": "/docs",
+        "message": "DevBoard API is online. Frontend static files not mounted.",
+    }
+
+
+if FRONTEND_DIR and os.path.isdir(FRONTEND_DIR):
+    app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
+
