@@ -71,10 +71,16 @@ def seed_database(db: Session):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    Base.metadata.create_all(bind=engine)
+    try:
+        Base.metadata.create_all(bind=engine)
+    except Exception as e:
+        logger.warning(f"Database schema initialization handled or existing: {e}")
+
     db = SessionLocal()
     try:
         seed_database(db)
+    except Exception as e:
+        logger.warning(f"Database seed initialization notice: {e}")
     finally:
         db.close()
     yield

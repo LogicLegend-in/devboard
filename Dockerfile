@@ -45,4 +45,4 @@ EXPOSE 8004
 HEALTHCHECK --interval=20s --timeout=5s --start-period=10s --retries=3 \
   CMD python -c "import urllib.request, os; port = os.getenv('PORT', '8004'); urllib.request.urlopen(f'http://localhost:{port}/health')"
 
-CMD ["sh", "-c", "uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-8004} --workers ${WORKERS:-2}"]
+CMD ["sh", "-c", "uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-8004} --workers ${WORKERS:-1}"]
