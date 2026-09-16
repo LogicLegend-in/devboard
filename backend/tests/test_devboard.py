@@ -161,3 +161,34 @@ def test_engineering_metrics_calculation():
     assert "lead_time_for_changes" in metrics.metric_definitions
     assert "commit_frequency_weekly" in metrics.metric_definitions
     assert metrics.dora.change_failure_rate_percent == 3.8
+
+
+def test_record_details_and_health_status():
+    client = TestClient(app)
+    # Test single repo detail
+    repo_resp = client.get("/api/v1/devboard/repositories/repo-test")
+    assert repo_resp.status_code == 200
+    assert repo_resp.json()["name"] == "test-service"
+
+    # Test single PR detail
+    pr_resp = client.get("/api/v1/devboard/pull-requests/pr-0")
+    assert pr_resp.status_code == 200
+    assert pr_resp.json()["number"] == 1
+
+    # Test single workflow run detail
+    wf_resp = client.get("/api/v1/devboard/workflows/wf-0")
+    assert wf_resp.status_code == 200
+    assert wf_resp.json()["workflow_name"] == "CI Test"
+
+    # Test single deployment detail
+    dep_resp = client.get("/api/v1/devboard/deployments/dep-1")
+    assert dep_resp.status_code == 200
+    assert dep_resp.json()["environment"] == "production"
+
+    # Test diagnostic health endpoint
+    health_resp = client.get("/api/v1/devboard/health/status")
+    assert health_resp.status_code == 200
+    assert health_resp.json()["status"] == "healthy"
+    assert "services" in health_resp.json()
+    assert health_resp.json()["services"]["database"]["status"] == "healthy"
+

@@ -132,3 +132,67 @@ def list_deployments(repo_id: Optional[str] = None, db: Session = Depends(get_db
 @router.get("/metrics", response_model=EngineeringMetricsSummary)
 def get_engineering_metrics(repo_id: Optional[str] = None, db: Session = Depends(get_db)):
     return metrics_engine.compute_metrics(db, repo_id=repo_id)
+
+
+# -------------------------------------------------------------
+# Deep Record Detail & Diagnostic Health Endpoints
+# -------------------------------------------------------------
+@router.get("/repositories/{repo_id}")
+def get_repository(repo_id: str, db: Session = Depends(get_db)):
+    repo = db.query(Repository).filter(Repository.id == repo_id).first()
+    if not repo:
+        raise HTTPException(status_code=404, detail="Repository not found")
+    return repo
+
+
+@router.get("/pull-requests/{pr_id}")
+def get_pull_request(pr_id: str, db: Session = Depends(get_db)):
+    pr = db.query(PullRequestRecord).filter(PullRequestRecord.id == pr_id).first()
+    if not pr:
+        raise HTTPException(status_code=404, detail="Pull request not found")
+    return pr
+
+
+@router.get("/workflows/{run_id}")
+def get_workflow_run(run_id: str, db: Session = Depends(get_db)):
+    run = db.query(WorkflowRunRecord).filter(WorkflowRunRecord.id == run_id).first()
+    if not run:
+        raise HTTPException(status_code=404, detail="Workflow run not found")
+    return run
+
+
+@router.get("/deployments/{dep_id}")
+def get_deployment(dep_id: str, db: Session = Depends(get_db)):
+    dep = db.query(DeploymentRecord).filter(DeploymentRecord.id == dep_id).first()
+    if not dep:
+        raise HTTPException(status_code=404, detail="Deployment not found")
+    return dep
+
+
+@router.get("/health/status")
+def get_system_health(db: Session = Depends(get_db)):
+    import time, os
+    from datetime import datetime, timezone
+    from sqlalchemy import text
+
+    db_status = "healthy"
+    latency_ms = 0.0
+    try:
+        start = time.perf_counter()
+        db.execute(text("SELECT 1"))
+        latency_ms = round((time.perf_counter() - start) * 1000, 2)
+    except Exception:
+        db_status = "degraded"
+
+    db_engine = "postgresql" if "postgres" in os.getenv("DATABASE_URL", "") else "sqlite"
+    return {
+        "status": "healthy" if db_status == "healthy" else "degraded",
+        "services": {
+            "api": {"status": "healthy", "service": "devboard-api", "version": "1.0.0"},
+            "database": {"status": db_status, "engine": db_engine, "latency_ms": latency_ms},
+            "github_connector": {"status": "healthy", "mode": "authenticated" if os.getenv("GITHUB_TOKEN") else "simulated_telemetry"},
+            "workers": {"status": "healthy", "active_processes": int(os.getenv("WORKERS", "1"))},
+        },
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
