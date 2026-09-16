@@ -25,40 +25,48 @@ SessionLocal = create_session_factory(engine)
 
 
 def seed_database(db: Session):
-    if db.query(Repository).count() > 0:
-        return
+    try:
+        if db.query(Repository).count() > 0:
+            return
 
-    logger.info("Seeding DevBoard with tracked repositories, CI/CD pipelines, and engineering commits...")
+        logger.info("Seeding DevBoard with tracked repositories, CI/CD pipelines, and engineering commits...")
 
-    sample_repos = [
-        ("repo-iot-sentinel", "logiclegend/iot-sentinel", "iot-sentinel", "Real-time IoT device monitoring & anomaly detection"),
-        ("repo-campusml", "logiclegend/campusml", "campusml", "Institutional machine learning & timetable operations"),
-        ("repo-openapi-hub", "logiclegend/openapi-hub", "openapi-hub", "Developer API testing sandbox & OpenAPI spec repository"),
-        ("repo-core-platform", "logiclegend/production-platform", "production-platform", "Ecosystem microservices, shared auth, and k8s infrastructure"),
-    ]
+        sample_repos = [
+            ("repo-iot-sentinel", "logiclegend/iot-sentinel", "iot-sentinel", "Real-time IoT device monitoring & anomaly detection"),
+            ("repo-campusml", "logiclegend/campusml", "campusml", "Institutional machine learning & timetable operations"),
+            ("repo-openapi-hub", "logiclegend/openapi-hub", "openapi-hub", "Developer API testing sandbox & OpenAPI spec repository"),
+            ("repo-core-platform", "logiclegend/production-platform", "production-platform", "Ecosystem microservices, shared auth, and k8s infrastructure"),
+        ]
 
-    for r_id, full_name, name, desc in sample_repos:
-        repo = Repository(
-            id=r_id,
-            full_name=full_name,
-            name=name,
-            description=desc,
-            default_branch="main",
-            open_issues_count=4,
-            stars_count=142,
-            forks_count=28,
-        )
-        db.add(repo)
-        db.flush()
+        for r_id, full_name, name, desc in sample_repos:
+            existing = db.query(Repository).filter((Repository.id == r_id) | (Repository.full_name == full_name)).first()
+            if existing:
+                continue
 
-        activity = github_client.generate_simulated_activity(repo)
-        db.add_all(activity["commits"])
-        db.add_all(activity["pull_requests"])
-        db.add_all(activity["workflow_runs"])
-        db.add_all(activity["deployments"])
+            repo = Repository(
+                id=r_id,
+                full_name=full_name,
+                name=name,
+                description=desc,
+                default_branch="main",
+                open_issues_count=4,
+                stars_count=142,
+                forks_count=28,
+            )
+            db.add(repo)
+            db.flush()
 
-    db.commit()
-    logger.info("DevBoard seeded successfully.")
+            activity = github_client.generate_simulated_activity(repo)
+            db.add_all(activity["commits"])
+            db.add_all(activity["pull_requests"])
+            db.add_all(activity["workflow_runs"])
+            db.add_all(activity["deployments"])
+
+        db.commit()
+        logger.info("DevBoard seeded successfully.")
+    except Exception as e:
+        db.rollback()
+        logger.warning(f"Database seed completed concurrently or skipped: {e}")
 
 
 @asynccontextmanager
