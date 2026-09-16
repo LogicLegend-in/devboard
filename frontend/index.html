@@ -1174,10 +1174,32 @@
     .spin { display: inline-block; animation: spin 0.85s linear infinite; }
 
     /* ==========================================================================
-       RESPONSIVENESS & MOBILE DRAWER
+       RESPONSIVENESS & ANDROID / MOBILE SYSTEM
        ========================================================================== */
     .mobile-nav-bar {
       display: none;
+    }
+
+    .grid-overview-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-bottom: 24px;
+    }
+
+    .grid-health-3col {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+
+    .grid-defs-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      font-size: 12.5px;
+      color: var(--text-secondary);
     }
 
     @media (max-width: 1024px) {
@@ -1185,51 +1207,175 @@
         grid-template-columns: repeat(2, 1fr);
       }
       .content-area { padding: 24px; }
+      .grid-overview-2col {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
     }
 
     @media (max-width: 768px) {
       .sidebar {
-        display: none;
+        display: none !important;
       }
       .main-wrapper {
-        margin-left: 0;
-        padding-bottom: 60px;
+        margin-left: 0 !important;
+        padding-bottom: calc(72px + env(safe-area-inset-bottom, 16px)) !important;
       }
       .topbar {
+        height: 52px;
         padding: 0 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
       }
+      .topbar-left {
+        gap: 8px;
+        min-width: 0;
+      }
+      .topbar-right {
+        gap: 8px;
+      }
+      /* Prevent mobile topbar overflow/collision */
+      .search-trigger,
+      .telemetry-tag {
+        display: none !important;
+      }
+      .breadcrumb {
+        font-size: 11px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .btn-sync {
+        padding: 6px 12px;
+        font-size: 10px;
+        letter-spacing: 0.04em;
+        white-space: nowrap;
+      }
+
       .content-area {
-        padding: 20px 16px 40px;
+        padding: 20px 16px calc(76px + env(safe-area-inset-bottom, 16px));
       }
+      .editorial-header {
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+      }
+      .editorial-title {
+        font-size: 21px;
+        line-height: 1.2;
+      }
+      .editorial-subtitle {
+        font-size: 13px;
+        margin-top: 6px;
+      }
+
+      /* Compact single-column metric grid for Android viewports */
       .editorial-metric-grid, .dora-grid {
         grid-template-columns: 1fr;
+        margin-bottom: 24px;
       }
-      .editorial-title { font-size: 22px; }
+      .editorial-metric-block {
+        padding: 18px 20px;
+        min-height: 96px;
+      }
+      .metric-value {
+        font-size: 32px;
+        margin: 6px 0 2px;
+      }
+
+      .grid-overview-2col {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+      .grid-health-3col {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+      .grid-defs-2col {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      /* Deployments environment progression flow stacked on mobile */
+      .env-flow {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        padding: 14px;
+      }
+      .env-flow .pipeline-arrow {
+        transform: rotate(90deg);
+        align-self: center;
+      }
+
+      /* Chart container */
+      .chart-container {
+        padding: 16px 14px;
+      }
+      .svg-chart-wrap {
+        height: 140px;
+      }
+
+      /* Full width slide-over inspector on mobile */
+      .inspector-drawer {
+        width: 100vw;
+        max-width: 100vw;
+        border-left: none;
+        padding: 24px 18px;
+      }
+
+      /* Palette modal responsive bounds */
+      .palette-backdrop {
+        padding-top: 5vh;
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+      .palette-modal {
+        width: 100%;
+        max-width: 100%;
+      }
+
+      /* Touch-friendly Android Navigation Bar */
       .mobile-nav-bar {
         position: fixed;
         bottom: 0; left: 0; right: 0;
-        height: 56px;
-        background: var(--bg-surface);
+        height: calc(56px + env(safe-area-inset-bottom, 0px));
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+        background: rgba(10, 11, 13, 0.96);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
         border-top: 1px solid var(--border);
         display: flex;
         align-items: center;
         justify-content: space-around;
-        z-index: 100;
+        z-index: 1000;
+        touch-action: manipulation;
       }
       .mobile-nav-btn {
+        flex: 1;
+        height: 100%;
         background: transparent;
         border: none;
         color: var(--text-muted);
         font-family: var(--font-mono);
-        font-size: 9.5px;
+        font-size: 9px;
+        font-weight: 500;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 3px;
+        justify-content: center;
+        gap: 4px;
         cursor: pointer;
-        padding: 6px;
+        padding: 6px 0;
+        transition: color var(--transition-fast);
+        -webkit-tap-highlight-color: transparent;
       }
-      .mobile-nav-btn.active { color: var(--accent-blue); }
+      .mobile-nav-btn.active {
+        color: var(--accent-blue);
+      }
+      .mobile-nav-btn svg {
+        stroke: currentColor;
+      }
     }
   </style>
 </head>
@@ -1456,7 +1602,7 @@
           </div>
 
           <!-- Two Column: Recent Activity & Tracked Repositories -->
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 24px;">
+          <div class="grid-overview-2col">
             <div>
               <div class="section-header">
                 <div>
@@ -1724,7 +1870,7 @@
 
           <div class="card-panel" style="padding: 28px; margin-bottom: 28px;">
             <h3 style="font-size: 13px; font-weight: 700; margin-bottom: 16px; font-family: var(--font-mono); color: var(--accent-blue);">DORA FOUR KEY METRICS DEFINITIONS</h3>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; font-size: 12.5px; color: var(--text-secondary);">
+            <div class="grid-defs-2col">
               <div>
                 <strong style="color: var(--text-main);">Deployment Frequency</strong>: Measures how often code is deployed to production. High performers deploy multiple times per week or day.
               </div>
@@ -1792,7 +1938,7 @@
             </p>
           </div>
 
-          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 28px;">
+          <div class="grid-health-3col">
             <div class="card-panel" style="padding: 20px;">
               <div class="metric-label">API ENGINE</div>
               <div style="font-size: 18px; font-weight: 700; margin: 8px 0; color: var(--text-main);">
@@ -1900,24 +2046,24 @@
        MOBILE BOTTOM NAVIGATION
        ========================================================================== -->
   <nav class="mobile-nav-bar">
-    <button class="mobile-nav-btn active" onclick="switchRoute('overview')">
-      <span>◌</span>
+    <button class="mobile-nav-btn active" data-route="overview" onclick="switchRoute('overview')" aria-label="Overview">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       <span>Overview</span>
     </button>
-    <button class="mobile-nav-btn" onclick="switchRoute('repositories')">
-      <span>◌</span>
+    <button class="mobile-nav-btn" data-route="repositories" onclick="switchRoute('repositories')" aria-label="Repositories">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
       <span>Repos</span>
     </button>
-    <button class="mobile-nav-btn" onclick="switchRoute('pull-requests')">
-      <span>◌</span>
+    <button class="mobile-nav-btn" data-route="pull-requests" onclick="switchRoute('pull-requests')" aria-label="Pull Requests">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><line x1="6" y1="9" x2="6" y2="21"/></svg>
       <span>PRs</span>
     </button>
-    <button class="mobile-nav-btn" onclick="switchRoute('cicd')">
-      <span>◌</span>
+    <button class="mobile-nav-btn" data-route="cicd" onclick="switchRoute('cicd')" aria-label="CI / CD">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       <span>CI/CD</span>
     </button>
-    <button class="mobile-nav-btn" onclick="openCommandPalette()">
-      <span>⌘</span>
+    <button class="mobile-nav-btn" data-route="search" onclick="openCommandPalette()" aria-label="Search">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
       <span>Search</span>
     </button>
   </nav>
@@ -2037,8 +2183,8 @@
       });
 
       // Update mobile nav
-      document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.innerText.toLowerCase().includes(route.slice(0, 4)));
+      document.querySelectorAll('.mobile-nav-bar .mobile-nav-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.route === route);
       });
 
       // Show matching view
