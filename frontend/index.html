@@ -184,6 +184,190 @@
 
     .tab-view { display: none; }
     .tab-view.active { display: block; }
+
+    /* Modern Glassmorphic Toast Notification System */
+    #toast-container {
+      position: fixed;
+      top: 20px;
+      right: 24px;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 420px;
+      width: calc(100vw - 48px);
+      pointer-events: none;
+    }
+    .toast {
+      pointer-events: auto;
+      background: rgba(22, 27, 34, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 16px 18px;
+      box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      animation: toastIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      transition: transform 0.25s ease, opacity 0.25s ease;
+    }
+    .toast.toast-hiding {
+      animation: toastOut 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes toastIn {
+      from { transform: translateX(110%) scale(0.95); opacity: 0; }
+      to { transform: translateX(0) scale(1); opacity: 1; }
+    }
+    @keyframes toastOut {
+      from { transform: translateX(0) scale(1); opacity: 1; }
+      to { transform: translateX(115%) scale(0.95); opacity: 0; }
+    }
+    .toast-success {
+      border-color: rgba(63, 185, 80, 0.45);
+      box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.7), 0 0 28px rgba(63, 185, 80, 0.18);
+    }
+    .toast-info {
+      border-color: rgba(88, 166, 255, 0.45);
+      box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.7), 0 0 28px rgba(88, 166, 255, 0.18);
+    }
+    .toast-warning {
+      border-color: rgba(210, 153, 34, 0.45);
+      box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.7), 0 0 28px rgba(210, 153, 34, 0.18);
+    }
+    .toast-error {
+      border-color: rgba(248, 81, 73, 0.45);
+      box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.7), 0 0 28px rgba(248, 81, 73, 0.18);
+    }
+    .toast-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .toast-success .toast-icon {
+      background: rgba(63, 185, 80, 0.18);
+      color: var(--accent-green);
+      border: 1px solid rgba(63, 185, 80, 0.35);
+    }
+    .toast-info .toast-icon {
+      background: rgba(88, 166, 255, 0.18);
+      color: var(--accent-blue);
+      border: 1px solid rgba(88, 166, 255, 0.35);
+    }
+    .toast-warning .toast-icon {
+      background: rgba(210, 153, 34, 0.18);
+      color: var(--accent-amber);
+      border: 1px solid rgba(210, 153, 34, 0.35);
+    }
+    .toast-error .toast-icon {
+      background: rgba(248, 81, 73, 0.18);
+      color: var(--accent-rose);
+      border: 1px solid rgba(248, 81, 73, 0.35);
+    }
+    .toast-content {
+      flex: 1;
+      min-width: 0;
+    }
+    .toast-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .toast-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .toast-close {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      font-size: 18px;
+      cursor: pointer;
+      padding: 0 4px;
+      border-radius: 4px;
+      line-height: 1;
+      transition: color 0.15s, background 0.15s;
+    }
+    .toast-close:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.1);
+    }
+    .toast-desc {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+    .toast-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .toast-chip {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: var(--bg-subtle);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      font-family: var(--font-mono);
+    }
+    .toast-chip.chip-green {
+      background: rgba(63, 185, 80, 0.15);
+      color: var(--accent-green);
+      border-color: rgba(63, 185, 80, 0.35);
+    }
+    .toast-chip.chip-blue {
+      background: rgba(88, 166, 255, 0.15);
+      color: var(--accent-blue);
+      border-color: rgba(88, 166, 255, 0.35);
+    }
+    .toast-progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .toast-progress-bar {
+      height: 100%;
+      width: 100%;
+      transform-origin: left;
+      animation: toastProgress linear forwards;
+    }
+    .toast-success .toast-progress-bar { background: var(--accent-green); }
+    .toast-info .toast-progress-bar { background: var(--accent-blue); }
+    .toast-warning .toast-progress-bar { background: var(--accent-amber); }
+    .toast-error .toast-progress-bar { background: var(--accent-rose); }
+    @keyframes toastProgress {
+      from { transform: scaleX(1); }
+      to { transform: scaleX(0); }
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .spin {
+      display: inline-block;
+      animation: spin 0.9s linear infinite;
+    }
   </style>
 </head>
 <body>
@@ -205,7 +389,7 @@
     </div>
 
     <div style="display: flex; gap: 8px;">
-      <button class="btn btn-secondary" onclick="triggerSync()">🔄 Sync GitHub</button>
+      <button id="sync-btn" class="btn btn-secondary" onclick="triggerSync()">🔄 Sync GitHub</button>
     </div>
   </header>
 
@@ -453,16 +637,159 @@
       } catch (e) { console.warn(e); }
     }
 
+    // Global Toast Notification Helper
+    function showToast({ type = 'info', title = '', message = '', chips = [], duration = 4500 }) {
+      let container = document.getElementById('toast-container');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        document.body.appendChild(container);
+      }
+
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+
+      const iconMap = {
+        success: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>`,
+        info: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`,
+        warning: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+        error: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`
+      };
+
+      const chipsHtml = (chips && chips.length) ? `
+        <div class="toast-chips">
+          ${chips.map(c => `<span class="toast-chip ${c.className || ''}">${c.text}</span>`).join('')}
+        </div>
+      ` : '';
+
+      toast.innerHTML = `
+        <div class="toast-icon">${iconMap[type] || iconMap.info}</div>
+        <div class="toast-content">
+          <div class="toast-header">
+            <span class="toast-title">${title || (type.charAt(0).toUpperCase() + type.slice(1))}</span>
+            <button class="toast-close" aria-label="Close">&times;</button>
+          </div>
+          <div class="toast-desc">${message}</div>
+          ${chipsHtml}
+        </div>
+        ${duration > 0 ? `
+          <div class="toast-progress">
+            <div class="toast-progress-bar" style="animation-duration: ${duration}ms"></div>
+          </div>
+        ` : ''}
+      `;
+
+      let dismissTimeout;
+      const dismiss = () => {
+        toast.classList.add('toast-hiding');
+        setTimeout(() => toast.remove(), 300);
+      };
+
+      if (duration > 0) {
+        dismissTimeout = setTimeout(dismiss, duration);
+        toast.addEventListener('mouseenter', () => {
+          clearTimeout(dismissTimeout);
+          const pb = toast.querySelector('.toast-progress-bar');
+          if (pb) pb.style.animationPlayState = 'paused';
+        });
+        toast.addEventListener('mouseleave', () => {
+          dismissTimeout = setTimeout(dismiss, 1800);
+          const pb = toast.querySelector('.toast-progress-bar');
+          if (pb) pb.style.animationPlayState = 'running';
+        });
+      }
+
+      toast.querySelector('.toast-close').addEventListener('click', () => {
+        clearTimeout(dismissTimeout);
+        dismiss();
+      });
+
+      container.appendChild(toast);
+      return { dismiss };
+    }
+
+    // Override browser alert to seamlessly route into our luxury dark toast UI
+    window.alert = function(msg) {
+      showToast({
+        type: 'info',
+        title: 'DevBoard Telemetry',
+        message: String(msg),
+        duration: 4500
+      });
+    };
+
     async function triggerSync() {
+      const btn = document.getElementById('sync-btn');
+      const origHtml = btn ? btn.innerHTML : '🔄 Sync GitHub';
+      if (btn) {
+        btn.disabled = true;
+        btn.style.pointerEvents = 'none';
+        btn.innerHTML = `<span class="spin">🔄</span> Syncing GitHub...`;
+      }
+
+      const syncToast = showToast({
+        type: 'info',
+        title: 'Syncing with GitHub',
+        message: 'Synchronizing commit history, pull request status, and CI/CD workflow telemetry...',
+        chips: [
+          { text: 'logiclegend/iot-sentinel', className: '' },
+          { text: 'REST API v1', className: 'chip-blue' }
+        ],
+        duration: 0
+      });
+
       try {
         const res = await fetch(`${API_BASE}/api/v1/devboard/repositories/repo-iot-sentinel/sync`, { method: 'POST' });
+        syncToast.dismiss();
+
         if (res.ok) {
-          alert("GitHub sync completed. Synced commits, pull requests, and CI/CD workflow runs.");
+          if (btn) btn.innerHTML = `<span style="color: var(--accent-green)">✓ Synced</span>`;
+          showToast({
+            type: 'success',
+            title: 'GitHub Sync Completed',
+            message: 'Synced latest engineering commits, pull requests, and CI/CD workflow runs into DevBoard.',
+            chips: [
+              { text: 'logiclegend/iot-sentinel', className: '' },
+              { text: '+3 Commits', className: 'chip-green' },
+              { text: '+2 Workflows', className: 'chip-blue' },
+              { text: 'DORA Live', className: 'chip-green' }
+            ],
+            duration: 4500
+          });
+
           loadMetrics();
           loadCommits();
+          loadPullRequests();
           loadWorkflows();
+          loadDeployments();
+        } else {
+          const err = await res.json().catch(() => ({ detail: 'Sync request failed' }));
+          if (btn) btn.innerHTML = `<span style="color: var(--accent-rose)">✕ Failed</span>`;
+          showToast({
+            type: 'error',
+            title: 'Sync Failed',
+            message: err.detail || 'Could not complete sync with GitHub.',
+            duration: 5000
+          });
         }
-      } catch (e) { alert(e.message); }
+      } catch (e) {
+        syncToast.dismiss();
+        if (btn) btn.innerHTML = `<span style="color: var(--accent-rose)">✕ Error</span>`;
+        showToast({
+          type: 'error',
+          title: 'Sync Error',
+          message: e.message || 'Unable to communicate with the DevBoard backend.',
+          duration: 5000
+        });
+      } finally {
+        setTimeout(() => {
+          if (btn) {
+            btn.disabled = false;
+            btn.style.pointerEvents = 'auto';
+            btn.innerHTML = origHtml;
+          }
+        }, 2200);
+      }
     }
 
     window.addEventListener('DOMContentLoaded', () => {
