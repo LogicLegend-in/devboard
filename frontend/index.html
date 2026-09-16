@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevBoard — Unified Developer Productivity & Engineering Observability</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #0d1117;
+      --bg-card: #161b22;
+      --bg-subtle: #21262d;
+      --border: #30363d;
+      --border-accent: #388bfd;
+      --text-main: #f0f6fc;
+      --text-muted: #8b949e;
+      --text-dim: #6e7681;
+      --accent-blue: #58a6ff;
+      --accent-green: #3fb950;
+      --accent-purple: #bc8cff;
+      --accent-amber: #d29922;
+      --accent-rose: #f85149;
+      --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .top-bar {
+      height: 60px;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-logo {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, #238636, #2ea043);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 16px; color: white;
+      box-shadow: 0 0 12px rgba(46, 160, 67, 0.4);
+    }
+    .brand-title h1 { font-size: 15px; font-weight: 700; }
+    .brand-title span { font-size: 11px; color: var(--accent-green); font-weight: 600; text-transform: uppercase; }
+
+    .nav-tabs { display: flex; gap: 6px; }
+    .nav-btn {
+      padding: 7px 14px;
+      border-radius: 6px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .nav-btn:hover { color: white; background: rgba(255,255,255,0.06); }
+    .nav-btn.active { color: white; background: var(--border); }
+
+    .btn {
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-family: var(--font-sans);
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-primary { background: #238636; color: white; }
+    .btn-primary:hover { background: #2ea043; }
+    .btn-secondary { background: var(--bg-subtle); border-color: var(--border); color: white; }
+    .btn-secondary:hover { border-color: var(--accent-blue); }
+
+    .container {
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px 28px;
+      flex: 1;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+    }
+    .kpi-label { font-size: 11.5px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
+    .kpi-val { font-size: 26px; font-weight: 800; margin: 6px 0 2px 0; }
+    .kpi-sub { font-size: 12px; color: var(--text-dim); }
+
+    /* DORA Banner */
+    .dora-banner {
+      background: linear-gradient(90deg, rgba(88, 166, 255, 0.08), rgba(63, 185, 80, 0.08));
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 22px;
+      margin-bottom: 24px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    .dora-item .dora-title { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+    .dora-item .dora-val { font-size: 18px; font-weight: 700; color: var(--text-main); margin-top: 4px; }
+    .dora-item .dora-tier { font-size: 11px; color: var(--accent-green); font-weight: 600; }
+
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .card-header h2 { font-size: 15px; font-weight: 700; }
+
+    table.table-modern {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    table.table-modern th {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-dim);
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+    table.table-modern td {
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+    table.table-modern tr:hover td { background: var(--bg-subtle); color: var(--text-main); }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .badge-success { background: rgba(63, 185, 80, 0.15); color: var(--accent-green); }
+    .badge-failure { background: rgba(248, 81, 73, 0.15); color: var(--accent-rose); }
+    .badge-merged { background: rgba(188, 140, 255, 0.15); color: var(--accent-purple); }
+    .badge-open { background: rgba(88, 166, 255, 0.15); color: var(--accent-blue); }
+
+    .tab-view { display: none; }
+    .tab-view.active { display: block; }
+  </style>
+</head>
+<body>
+
+  <header class="top-bar">
+    <div class="brand">
+      <div class="brand-logo">D</div>
+      <div class="brand-title">
+        <h1>DevBoard</h1>
+        <span>Engineering Observability & DORA</span>
+      </div>
+    </div>
+
+    <div class="nav-tabs">
+      <button class="nav-btn active" onclick="switchTab('overview')">Overview</button>
+      <button class="nav-btn" onclick="switchTab('prs')">Pull Requests</button>
+      <button class="nav-btn" onclick="switchTab('cicd')">CI/CD Pipelines</button>
+      <button class="nav-btn" onclick="switchTab('deployments')">Deployments</button>
+    </div>
+
+    <div style="display: flex; gap: 8px;">
+      <button class="btn btn-secondary" onclick="triggerSync()">🔄 Sync GitHub</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- DORA Metrics Banner -->
+    <div class="dora-banner">
+      <div class="dora-item">
+        <div class="dora-title">Deployment Frequency</div>
+        <div class="dora-val" id="dora-freq">3 / week</div>
+        <div class="dora-tier">High Performer Tier</div>
+      </div>
+      <div class="dora-item">
+        <div class="dora-title">Lead Time for Changes</div>
+        <div class="dora-val" id="dora-lead">14.2 hours</div>
+        <div class="dora-tier">PR Open → Production</div>
+      </div>
+      <div class="dora-item">
+        <div class="dora-title">Change Failure Rate</div>
+        <div class="dora-val" id="dora-cfr" style="color: var(--accent-green)">3.8%</div>
+        <div class="dora-tier">Industry Low Risk</div>
+      </div>
+      <div class="dora-item">
+        <div class="dora-title">Mean Time to Restore</div>
+        <div class="dora-val" id="dora-mttr">1.1 hours</div>
+        <div class="dora-tier">Automated Recovery</div>
+      </div>
+    </div>
+
+    <!-- Tab 1: Overview -->
+    <div id="tab-overview" class="tab-view active">
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Commit Frequency</div>
+          <div class="kpi-val" id="kpi-commits" style="color: var(--accent-blue)">25</div>
+          <div class="kpi-sub">Commits this week</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">PR Throughput</div>
+          <div class="kpi-val" id="kpi-prs" style="color: var(--accent-purple)">4</div>
+          <div class="kpi-sub">Merged PRs / 7 days</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Avg PR Review Cycle</div>
+          <div class="kpi-val" id="kpi-cycle">14.5 <span style="font-size: 15px">hrs</span></div>
+          <div class="kpi-sub">Open to Merged time</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">CI/CD Build Success</div>
+          <div class="kpi-val" id="kpi-success-rate" style="color: var(--accent-green)">91.7%</div>
+          <div class="kpi-sub">Passing pipeline runs</div>
+        </div>
+      </div>
+
+      <div class="grid-2col">
+        <div class="card">
+          <div class="card-header">
+            <h2>Tracked Repositories</h2>
+          </div>
+          <table class="table-modern">
+            <thead>
+              <tr><th>Repository</th><th>Branch</th><th>Stars</th><th>Forks</th></tr>
+            </thead>
+            <tbody id="repos-body"></tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2>Recent Commit Activity</h2>
+          </div>
+          <table class="table-modern">
+            <thead>
+              <tr><th>SHA</th><th>Author</th><th>Message</th><th>Time</th></tr>
+            </thead>
+            <tbody id="commits-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 2: PRs -->
+    <div id="tab-prs" class="tab-view">
+      <div class="card">
+        <div class="card-header">
+          <h2>Code Review Turnaround & Pull Requests</h2>
+        </div>
+        <table class="table-modern">
+          <thead>
+            <tr><th>PR #</th><th>Title</th><th>Author</th><th>State</th><th>Review Turnaround</th><th>Diff</th></tr>
+          </thead>
+          <tbody id="prs-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab 3: CI/CD -->
+    <div id="tab-cicd" class="tab-view">
+      <div class="card">
+        <div class="card-header">
+          <h2>CI/CD GitHub Actions Pipeline Runs</h2>
+        </div>
+        <table class="table-modern">
+          <thead>
+            <tr><th>Run #</th><th>Workflow</th><th>Branch</th><th>Conclusion</th><th>Duration</th><th>Triggered</th></tr>
+          </thead>
+          <tbody id="cicd-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab 4: Deployments -->
+    <div id="tab-deployments" class="tab-view">
+      <div class="card">
+        <div class="card-header">
+          <h2>Production & Staging Deployments</h2>
+        </div>
+        <table class="table-modern">
+          <thead>
+            <tr><th>Deployment ID</th><th>Environment</th><th>Status</th><th>Operator</th><th>Timestamp</th></tr>
+          </thead>
+          <tbody id="deployments-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "http://localhost:8004";
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-view').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + tabId).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+
+    async function loadMetrics() {
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/devboard/metrics`);
+        if (!res.ok) return;
+        const data = await res.json();
+        document.getElementById('kpi-commits').innerText = data.commit_frequency_weekly;
+        document.getElementById('kpi-prs').innerText = data.pr_throughput_weekly;
+        document.getElementById('kpi-cycle').innerHTML = `${data.average_pr_cycle_time_hours} <span style="font-size: 15px">hrs</span>`;
+        document.getElementById('kpi-success-rate').innerText = `${data.build_success_rate_percent}%`;
+
+        document.getElementById('dora-freq').innerText = data.dora.deployment_frequency;
+        document.getElementById('dora-lead').innerText = `${data.dora.lead_time_for_changes_hours} hrs`;
+        document.getElementById('dora-cfr').innerText = `${data.dora.change_failure_rate_percent}%`;
+        document.getElementById('dora-mttr').innerText = `${data.dora.time_to_restore_service_hours} hrs`;
+      } catch (e) { console.warn(e); }
+    }
+
+    async function loadRepositories() {
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/devboard/repositories`);
+        if (!res.ok) return;
+        const repos = await res.json();
+        document.getElementById('repos-body').innerHTML = repos.map(r => `
+          <tr>
+            <td style="font-weight: 600; color: white;">
+              <span style="color: var(--accent-blue)">${r.full_name}</span>
+              <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">${r.description || ''}</div>
+            </td>
+            <td><span style="font-family: var(--font-mono); font-size: 11px;">${r.default_branch}</span></td>
+            <td>⭐ ${r.stars_count}</td>
+            <td>🍴 ${r.forks_count}</td>
+          </tr>
+        `).join('');
+      } catch (e) { console.warn(e); }
+    }
+
+    async function loadCommits() {
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/devboard/commits?limit=8`);
+        if (!res.ok) return;
+        const commits = await res.json();
+        document.getElementById('commits-body').innerHTML = commits.map(c => `
+          <tr>
+            <td style="font-family: var(--font-mono); color: var(--accent-blue)">${c.sha.slice(0, 7)}</td>
+            <td style="color: white">${c.author_name}</td>
+            <td style="font-size: 12.5px;">${c.message}</td>
+            <td style="font-size: 11px; color: var(--text-dim)">${new Date(c.committed_at).toLocaleDateString()}</td>
+          </tr>
+        `).join('');
+      } catch (e) { console.warn(e); }
+    }
+
+    async function loadPullRequests() {
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/devboard/pull-requests`);
+        if (!res.ok) return;
+        const prs = await res.json();
+        document.getElementById('prs-body').innerHTML = prs.map(pr => `
+          <tr>
+            <td style="font-family: var(--font-mono); color: var(--accent-blue)">#${pr.number}</td>
+            <td style="font-weight: 600; color: white;">${pr.title}</td>
+            <td>${pr.author}</td>
+            <td><span class="badge ${pr.state === 'merged' ? 'badge-merged' : 'badge-open'}">${pr.state}</span></td>
+            <td><strong>${pr.review_time_hours ? pr.review_time_hours + ' hrs' : 'In Review'}</strong></td>
+            <td style="font-family: var(--font-mono); font-size: 11.5px;">
+              <span style="color: var(--accent-green)">+${pr.additions}</span> / <span style="color: var(--accent-rose)">-${pr.deletions}</span>
+            </td>
+          </tr>
+        `).join('');
+      } catch (e) { console.warn(e); }
+    }
+
+    async function loadWorkflows() {
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/devboard/workflows`);
+        if (!res.ok) return;
+        const runs = await res.json();
+        document.getElementById('cicd-body').innerHTML = runs.map(w => `
+          <tr>
+            <td style="font-family: var(--font-mono); color: var(--accent-blue)">#${w.run_number}</td>
+            <td style="font-weight: 600; color: white;">${w.workflow_name}</td>
+            <td><span style="font-family: var(--font-mono); font-size: 11px;">${w.branch}</span></td>
+            <td><span class="badge ${w.conclusion === 'success' ? 'badge-success' : 'badge-failure'}">${w.conclusion}</span></td>
+            <td>${w.duration_seconds}s</td>
+            <td style="font-size: 11px; color: var(--text-dim)">${new Date(w.run_started_at).toLocaleTimeString()}</td>
+          </tr>
+        `).join('');
+      } catch (e) { console.warn(e); }
+    }
+
+    async function loadDeployments() {
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/devboard/deployments`);
+        if (!res.ok) return;
+        const deps = await res.json();
+        document.getElementById('deployments-body').innerHTML = deps.map(d => `
+          <tr>
+            <td style="font-family: var(--font-mono); color: var(--accent-blue)">${d.id.slice(0, 8)}...</td>
+            <td><strong style="color: white; text-transform: uppercase;">${d.environment}</strong></td>
+            <td><span class="badge badge-success">HEALTHY</span></td>
+            <td>${d.deployed_by}</td>
+            <td style="font-size: 11px; color: var(--text-dim)">${new Date(d.deployed_at).toLocaleString()}</td>
+          </tr>
+        `).join('');
+      } catch (e) { console.warn(e); }
+    }
+
+    async function triggerSync() {
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/devboard/repositories/repo-iot-sentinel/sync`, { method: 'POST' });
+        if (res.ok) {
+          alert("GitHub sync completed. Synced commits, pull requests, and CI/CD workflow runs.");
+          loadMetrics();
+          loadCommits();
+          loadWorkflows();
+        }
+      } catch (e) { alert(e.message); }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadMetrics();
+      loadRepositories();
+      loadCommits();
+      loadPullRequests();
+      loadWorkflows();
+      loadDeployments();
+    });
+  </script>
+</body>
+</html>
